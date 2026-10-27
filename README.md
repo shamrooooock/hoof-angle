@@ -11,7 +11,7 @@ A/Bボタンで対象点を選択して置き直せます。矢印キーは1画�
 このフォルダーの中身をGitHubリポジトリのルートへアップロードします。
 Settings → Pages → Deploy from a branch → main / (root) → Save。
 発行されたHTTPS URLを開いてください。サブパス配置にも対応しています。
-GitHubへのアップロードと公開は未実施です。アカウントやリポジトリの指定は不要なローカル成果物として納品しています。
+公開URL: https://shamrooooock.github.io/hoof-angle/
 ローカル確認は node server.mjs （要Node.js）。http://127.0.0.1:4173 を開きます。
 file:// で直接開くとES ModulesとService Workerが動かないため、HTTPサーバーが必要です。
 
@@ -22,8 +22,8 @@ file:// で直接開くとES ModulesとService Workerが動かないため、HTT
 
 ## 計算・座標
 デコード後のEXIF向き補正済み元画像座標を保存。表示変換を逆変換して点を指定し、表示倍率・画面サイズから独立して計算します。
-蹄冠角度 = atan2(A.y − B.y, abs(B.x − A.x)) × 180 / π。
-後方Bが高ければ正、左右反転でも同じ値。画像のy座標は下向き。
+蹄冠角度 = atan2(abs(A.y − B.y), abs(B.x − A.x)) × 180 / π。
+蹄冠角度は水平に対する傾きの大きさ（0〜90°）です。左右・上下の向きによらず非負の値になり、推定値もこの角度から計算します。画像のy座標は下向き。
 推定値 = 30 − 蹄冠角度。未丸め値から計算して、小数第1位で表示。1画像画素未満の点間距離は無効。
 createImageBitmap(imageOrientation: from-image)でEXIF方向を適用し、非対応時はブラウザ標準Imageデコードを使用。回転・水平補正は行いません。
 保存PNGは長辺最大2400px、元画像全体と基準点・線・結果・座標・保存日時を記載します。
