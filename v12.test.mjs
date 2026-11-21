@@ -24,7 +24,7 @@ function workerHarness(){
  const events={},stores=new Map(),deleted=[];let skips=0,claims=0,online=true;
  const cache={addAll:async reqs=>{for(const r of reqs)stores.set(r.url,{url:r.url});},match:async key=>stores.get((typeof key==='string'?key:key.url).replace('https://test/','./'))};
  const self={location:{origin:'https://test'},addEventListener:(k,v)=>events[k]=v,skipWaiting:()=>{skips++;},clients:{claim:async()=>claims++}};
- const context={self,URL,caches:{open:async()=>cache,keys:async()=>['shamrock-hoof-v1','unrelated','shamrock-hoof-20261028a'],delete:async key=>deleted.push(key)},Request:class{constructor(url,opts){this.url=url;this.cache=opts.cache;}},fetch:async req=>{if(!online)throw Error('offline');return {network:true,url:req.url};}};
+ const context={self,URL,caches:{open:async()=>cache,keys:async()=>['shamrock-hoof-v1','unrelated','shamrock-hoof-20261121a'],delete:async key=>deleted.push(key)},Request:class{constructor(url,opts){this.url=url;this.cache=opts.cache;}},fetch:async req=>{if(!online)throw Error('offline');return {network:true,url:req.url};}};
  vm.runInNewContext(fs.readFileSync(new URL('./sw.js',import.meta.url),'utf8'),context);
  const lifecycle=async name=>{let promise;events[name]({waitUntil:p=>promise=p});await promise;};
  return {events,stores,deleted,lifecycle,get skips(){return skips;},get claims(){return claims;},offline:()=>online=false};
@@ -35,7 +35,7 @@ test('PWA installs all local assets, waits for consent, cleans only own obsolete
  h.events.message({data:{type:'OTHER'}});assert.equal(h.skips,0);
  h.events.message({data:{type:'ACTIVATE_UPDATE'}});assert.equal(h.skips,1);
  await h.lifecycle('activate');assert.deepEqual(h.deleted,['shamrock-hoof-v1']);assert.equal(h.claims,1);
- h.offline();for(const url of ['./?v=anything','./app.js?v=20261028a','./i18n.mjs?v=20261028a']){let response;h.events.fetch({request:{method:'GET',url:'https://test/'+url.slice(2),mode:url.startsWith('./?')?'navigate':'cors'},respondWith:p=>response=p});
+ h.offline();for(const url of ['./?v=anything','./app.js?v=20261121a','./i18n.mjs?v=20261121a']){let response;h.events.fetch({request:{method:'GET',url:'https://test/'+url.slice(2),mode:url.startsWith('./?')?'navigate':'cors'},respondWith:p=>response=p});
  assert.equal((await response).url,url.startsWith('./?')?'./index.html':url);
  }
 });

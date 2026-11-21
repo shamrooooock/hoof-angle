@@ -1,0 +1,29 @@
+<!doctype html><meta charset="utf-8"><title>4点測定 ブラウザ検証</title>
+<style>body{font:16px sans-serif}iframe{width:390px;height:700px;border:1px solid #888}pre{white-space:pre-wrap}</style>
+<h1>4点測定 ブラウザ検証</h1><button id="run">検証を実行</button><pre id="log">待機中</pre>
+<iframe src="./index.html" title="スマートフォン幅の測定画面"></iframe>
+<script type="module">
+const frame=document.querySelector('iframe'),log=document.querySelector('#log');
+const wait=()=>new Promise(r=>setTimeout(r,100));
+document.querySelector('#run').onclick=async()=>{try{
+ log.textContent='検証中';const win=frame.contentWindow,doc=win.document,$=id=>doc.getElementById(id);
+ const assert=(ok,msg)=>{if(!ok)throw Error(msg);log.textContent+='\nPASS '+msg;};
+ const img=doc.createElement('canvas');img.width=600;img.height=400;const c=img.getContext('2d');c.fillStyle='white';c.fillRect(0,0,600,400);c.strokeStyle='#888';c.beginPath();c.moveTo(100,100);c.lineTo(400,273.205);c.moveTo(100,340);c.lineTo(400,340);c.stroke();
+ const blob=await new Promise(r=>img.toBlob(r));const transfer=new win.DataTransfer();transfer.items.add(new win.File([blob],'test-30deg.png',{type:'image/png'}));$('file').files=transfer.files;$('file').dispatchEvent(new win.Event('change'));
+ for(let i=0;i<50&&!$('empty').hidden;i++)await wait();assert($('empty').hidden,'PNG画像読込');
+ const canvas=$('canvas'),rect=canvas.getBoundingClientRect(),scale=Math.min(rect.width/600,rect.height/400),ox=(rect.width-600*scale)/2,oy=(rect.height-400*scale)/2;
+ const event=(type,p,id=1)=>canvas.dispatchEvent(new win.PointerEvent(type,{pointerId:id,pointerType:'touch',clientX:rect.left+ox+p[0]*scale,clientY:rect.top+oy+p[1]*scale,bubbles:true}));
+ // Synthetic pointers do not own native pointer capture; stub only that browser API for this harness.
+ canvas.setPointerCapture=()=>{};
+ const tap=p=>{event('pointerdown',p);event('pointerup',p);};
+ const ps=[[100,100],[400,273.205],[100,340],[400,340]];
+ for(let i=0;i<4;i++){tap(ps[i]);assert($('state'+'ABCD'[i]).textContent==='指定済','点'+'ABCD'[i]+'指定');if(i<3)assert($('save').disabled,'4点未完了では保存不可');}
+ assert($('angle').textContent==='30.0','相対角度30.0°');assert($('estimate').textContent==='0.0','30度基準維持');
+ for(let i=0;i<4;i++){const before=$('angle').textContent;$('select'+'ABCD'[i]).click();event('pointerdown',ps[i]);event('pointermove',[ps[i][0],ps[i][1]+20]);event('pointerup',[ps[i][0],ps[i][1]+20]);assert($('angle').textContent!==before,'点'+'ABCD'[i]+'ドラッグ再計算');event('pointerdown',[ps[i][0],ps[i][1]+20]);event('pointermove',ps[i]);event('pointerup',ps[i]);}
+ $('zoomIn').click();assert($('zoomBadge').textContent==='140%','拡大');$('fit').click();assert($('zoomBadge').textContent==='100%','全体表示');assert($('angle').textContent==='30.0','表示倍率で角度不変');
+ assert(doc.documentElement.scrollWidth<=win.innerWidth,'390px幅で横はみ出しなし');
+ $('horse').value='検証用';$('save').onclick();for(let i=0;i<50&&$('download').hidden;i++)await wait();assert(!$('download').hidden,'PNG保存生成');const out=await fetch($('download').href).then(r=>r.blob());assert(out.type==='image/png'&&out.size>1000,'PNG形式と出力');
+ $('language').value='en';$('language').onchange();assert($('selectC').textContent.includes('Bearing surface'),'英語');$('language').value='de';$('language').onchange();assert($('selectD').textContent.includes('Auflagefläche'),'ドイツ語');$('language').value='ja';$('language').onchange();
+ log.textContent+='\n全検証成功（合成イベント。実機タッチ・カメラは別途確認）';
+ }catch(e){log.textContent+='\nFAIL '+e.stack;}};
+</script>

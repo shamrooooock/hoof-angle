@@ -1,5 +1,5 @@
-const CACHE='shamrock-hoof-20261028a';
-const FILES=['./','./index.html','./style.css?v=20261028a','./app.js?v=20261028a','./geometry.mjs?v=20261028a','./i18n.mjs?v=20261028a','./export.mjs?v=20261028a','./updates.mjs?v=20261028a','./manifest.webmanifest','./icon.svg','./icon-192.png','./icon-512.png'];
+const CACHE='shamrock-hoof-20261121a';
+const FILES=['./','./index.html','./style.css?v=20261121a','./app.js?v=20261121a','./geometry.mjs?v=20261121a','./i18n.mjs?v=20261121a','./export.mjs?v=20261121a','./updates.mjs?v=20261121a','./manifest.webmanifest','./icon.svg','./icon-192.png','./icon-512.png'];
 self.addEventListener('install',event=>{
  // Fetch from network without the HTTP cache. Do not activate over a working session.
  event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(FILES.map(url=>new Request(url,{cache:'reload'})))));

@@ -1,5 +1,5 @@
-import {format} from './geometry.mjs?v=20261028a';
-import {translate,estimateKey} from './i18n.mjs?v=20261028a';
+import {format} from './geometry.mjs?v=20261121a';
+import {translate,estimateKey} from './i18n.mjs?v=20261121a';
 export function localDate(date=new Date()){return [date.getFullYear(),String(date.getMonth()+1).padStart(2,'0'),String(date.getDate()).padStart(2,'0')].join('-');}
 export function safePart(value,fallback){let s=String(value).normalize('NFC').replace(/[<>:"/\\|?*\u0000-\u001f\u007f]/g,'_').replace(/[\u202a-\u202e\u2066-\u2069]/g,'').trim().replace(/[. ]+$/g,'');s=Array.from(s).slice(0,60).join('');if(!s)s=fallback;if(/^(con|prn|aux|nul|com[1-9]|lpt[1-9])(?:\.|$)/i.test(s))s='_'+s;return s;}
 export function filename(info,lang){return safePart(info.horse,translate(lang,'unnamed'))+'_'+translate(lang,info.limb+'file')+'_'+(/^\d{4}-\d{2}-\d{2}$/.test(info.date)?info.date:'undated')+'.png';}
@@ -13,7 +13,7 @@ export async function makePNG(image,overlays,result,info,lang){
  const out=document.createElement('canvas');const ctx=out.getContext('2d');
  ctx.font=font+'px system-ui, sans-serif';
  const t=k=>translate(lang,k);
- const text=[t('app')+' · v1.2',t('horse')+': '+(info.horse.trim()||t('unnamed')),t('limb')+': '+t(info.limb),t('date')+': '+(info.date||t('dateMissing')),t('angle')+': '+format(result.angle)+'°',t(estimateKey(info.limb))+': '+format(result.estimate)+'°',t('pngFormula'),t('pngNote')];
+ const text=[t('app')+' · v1.2',t('horse')+': '+(info.horse.trim()||t('unnamed')),t('limb')+': '+t(info.limb),t('date')+': '+(info.date||t('dateMissing')),t('angle')+': '+format(result.angle)+'°',t(estimateKey(info.limb))+': '+format(result.estimate)+'°',t('pngReference'),t('pngFormula'),t('pngNote')];
  const lines=text.flatMap(s=>wrapText(ctx,s,width-2*padding));
  out.width=width;out.height=Math.ceil(ih+2*padding+lineHeight*lines.length);
  ctx.fillStyle='#f5f5ef';ctx.fillRect(0,0,out.width,out.height);

@@ -16,7 +16,7 @@ export function setupUpdates({t,setOffline,hasWork,getMetadata,restoreMetadata})
   registration.waiting.postMessage({type:'ACTIVATE_UPDATE'});
   timer=setTimeout(()=>{if(!reloaded){approved=false;button.disabled=false;status.textContent=t('updateError');}},15000);
  };
- navigator.serviceWorker.register('./sw.js?v=20261028a',{updateViaCache:'none'}).then(reg=>{
+ navigator.serviceWorker.register('./sw.js?v=20261121a',{updateViaCache:'none'}).then(reg=>{
   registration=reg;offer();
   const observe=worker=>{if(!worker)return;worker.addEventListener('statechange',()=>{if(worker.state==='installed')offer();if(worker.state==='activated')setOffline('offlineReady');if(worker.state==='redundant'&&!reg.active)setOffline('offlineError');});};
   observe(reg.installing);reg.addEventListener('updatefound',()=>observe(reg.installing));
